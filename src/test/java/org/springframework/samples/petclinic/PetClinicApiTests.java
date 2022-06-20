@@ -23,7 +23,7 @@ public class PetClinicApiTests {
 		public void shoulGetVisitWhenVisitIsFount(){}
 
 		@Test
-		@DisplayName("Получение отсутствующей запис12и")
+		@DisplayName("Получение отсутствующей запис12иjj")
 		public void shoulGetVisitWhenVisitIsNotFount(){}
 
 
