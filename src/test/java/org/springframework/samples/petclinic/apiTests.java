@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.*;
 
-public class OwnerApiTests {
+public class apiTests {
 	private static Connection connection;
 	private Integer ownerId;
 	private Integer visitId;
@@ -14,8 +14,14 @@ public class OwnerApiTests {
 	private ResultSet queryResult;
 
 	private static final Integer VISIT_PET_ID = 1;
-	private static final Date VISIT_DATE = new Date(2302715081L);
+	private static final Date VISIT_DATE = new Date(2302715081L); //1970
 	private static final String VISIT_DESC = "resurrects";
+
+	private static final String OWNER_FIRST_NAME = "John";
+	private static final String OWNER_SECOND_NAME = "Cena";
+	private static final String OWNER_ADDRESS = "1241, East Main Street";
+	private static final String OWNER_CITY = "Stamford";
+	private static final String OWNER_TELEPHONE = "6085551023";
 
 	@BeforeAll
 	public static void connect() throws SQLException {
@@ -33,20 +39,15 @@ public class OwnerApiTests {
 
 	@Test
 	void ownerCreate() throws SQLException {
-		var ownerFirstName = "John";
-		var ownerSecondName = "Cena";
-		var ownerAddress = "1241, East Main Street";
-		var city = "Stamford";
-		var telephone = "6085551023";
 		sql = connection.prepareStatement(
 			"INSERT INTO owners(first_name, last_name, address, city, telephone) VALUES(?,?,?,?,?)",
 			Statement.RETURN_GENERATED_KEYS
 		);
-		sql.setString(1, ownerFirstName);
-		sql.setString(2, ownerSecondName);
-		sql.setString(3, ownerAddress);
-		sql.setString(4, city);
-		sql.setString(5, telephone);
+		sql.setString(1, OWNER_FIRST_NAME);
+		sql.setString(2, OWNER_SECOND_NAME);
+		sql.setString(3, OWNER_ADDRESS);
+		sql.setString(4, OWNER_CITY);
+		sql.setString(5, OWNER_TELEPHONE);
 
 		sql.executeUpdate();
 		queryResult = sql.getGeneratedKeys();
