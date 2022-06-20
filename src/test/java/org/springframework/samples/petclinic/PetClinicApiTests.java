@@ -11,16 +11,6 @@ public class PetClinicApiTests {
 	private PreparedStatement sql;
 	private ResultSet queryResult;
 
-	private static final Integer VISIT_PET_ID = 1;
-	private static final Date VISIT_DATE = new Date(2302715081L); //1970
-	private static final String VISIT_DESC = "resurrects";
-
-	private static final String OWNER_FIRST_NAME = "John";
-	private static final String OWNER_SECOND_NAME = "Cena";
-	private static final String OWNER_ADDRESS = "1241, East Main Street";
-	private static final String OWNER_CITY = "Stamford";
-	private static final String OWNER_TELEPHONE = "6085551023";
-
 	@BeforeAll
 	public static void connect() throws SQLException {
 		connection = DriverManager.getConnection(
@@ -38,6 +28,10 @@ public class PetClinicApiTests {
 	@Nested
 	@DisplayName("Visit Tests")
 	public class visitTest{
+		private final Integer VISIT_PET_ID = 1;
+		private final Date VISIT_DATE = new Date(2302715081L); //1970
+		private final String VISIT_DESC = "resurrects";
+
 		@BeforeEach
 		void visitCreate() throws SQLException {
 			sql = connection.prepareStatement(
@@ -90,6 +84,12 @@ public class PetClinicApiTests {
 	@Nested
 	@DisplayName("Owner Tests")
 	public class ownerTest{
+		private final String OWNER_FIRST_NAME = "John";
+		private final String OWNER_SECOND_NAME = "Cena";
+		private final String OWNER_ADDRESS = "1241, East Main Street";
+		private final String OWNER_CITY = "Stamford";
+		private final String OWNER_TELEPHONE = "6085551023";
+
 		@BeforeEach
 		void ownerCreate() throws SQLException {
 			sql = connection.prepareStatement(
