@@ -1,12 +1,10 @@
 package org.springframework.samples.petclinic;
 
-
+import java.sql.*;
 import io.restassured.RestAssured;
 import io.restassured.authentication.PreemptiveBasicAuthScheme;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 
@@ -17,6 +15,8 @@ public class PetClinicApiTests {
 	private static Connection connection;
 	private Integer ownerId;
 	private Integer visitId;
+
+	private Integer petId = 1;
 	private PreparedStatement sql;
 	private ResultSet queryResult;
 
@@ -107,13 +107,6 @@ public class PetClinicApiTests {
 			.get("/owners/{ownerId}/pets/{petId}/visits",ownerId,petId)
 			.then()
 			.statusCode(404);
-/*
-				.body(
-					"id", is(5),
-					"countryName", is("Ac"),
-					"locations", not(empty())
-				);
-				*/
 		}
 
 
@@ -164,13 +157,13 @@ public class PetClinicApiTests {
 		@DisplayName("Создание нового пользователя")
 		public void shouldCreateOwnerWhenShouldNotExists(){
 			when()
-				.post("/owners/{ownerId}/pets/{petId}/visits",ownerId,petId)
+				.post("/owners/{ownerId}",ownerId)
 				.then()
 				.statusCode(201)
 				.body(
-					"id", is(5),
-					"firstName", is(OWNER_FIRSTNAME),
-					"locations", not(empty())
+
+					"firstName", is(OWNER_FIRST_NAME),
+					"id", not(empty())
 				);
 
 		}
