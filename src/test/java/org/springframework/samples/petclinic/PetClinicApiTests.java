@@ -172,7 +172,13 @@ public class PetClinicApiTests {
 		@Test
 		@DisplayName("Получение пользователя")
 		public void shouldGetOwnerWhenShouldExists(){
-
+			when()
+				.get("/owners/{ownerId}", ownerId)
+				.then()
+				.statusCode(200)
+				.body("firstName", is(OWNER_FIRST_NAME))
+				.body("lastName", is(OWNER_FIRST_NAME))
+				.body("telephone", is(OWNER_TELEPHONE));
 		}
 
 
