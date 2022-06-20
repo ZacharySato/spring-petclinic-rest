@@ -32,6 +32,14 @@ public class PetClinicApiTests {
 	@DisplayName("Owner Tests")
 	public class ownerTest{
 
+		@Test
+		@DisplayName("Создание нового пользователя")
+		public void shouldCreateOwnerWhenShouldNotExists(){}
+
+		@Test
+		@DisplayName("Получение пользователя")
+		public void shouldGetOwnerWhenShouldExists(){}
+
 
 	}
 	@Nested
