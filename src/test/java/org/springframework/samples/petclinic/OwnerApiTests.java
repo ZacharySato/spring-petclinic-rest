@@ -5,10 +5,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;
+import java.time.LocalDate;
 
-public class ownerApiTests {
+public class OwnerApiTests {
 	private static Connection connection;
 	private Integer ownerId;
+	private Integer visitId;
 	private PreparedStatement sql;
 	private ResultSet queryResult;
 
@@ -54,16 +56,49 @@ public class ownerApiTests {
 		PreparedStatement sql = connection.prepareStatement(
 			"DELETE FROM owners WHERE id = ?"
 		);
-		sql.setInt(1, 11);
+		sql.setInt(1, ownerId);
 		sql.executeUpdate();
 	}
 
 	@Test
 	void ownerFindQuery() throws SQLException {
 		sql = connection.prepareStatement("SELECT * FROM owners WHERE id = ?");
-		sql.setInt(1, 1);
+		sql.setInt(1, ownerId);
 		queryResult = sql.executeQuery();
-		/*queryResult.next();
-		System.out.println(queryResult.getString("first_name"));*/
+	}
+
+	@Test
+	void visitCreate() throws SQLException {
+		var visitPetId = 1;
+		var visitDate = new Date(336614400000L);
+		var visitDesc = "test";
+		sql = connection.prepareStatement(
+			"INSERT INTO visits(pet_id, visit_date, description) VALUES(?,?,?)",
+			Statement.RETURN_GENERATED_KEYS
+		);
+		sql.setInt(1, visitPetId);
+		sql.setDate(2, visitDate);
+		sql.setString(3, visitDesc);
+
+		sql.executeUpdate();
+		queryResult = sql.getGeneratedKeys();
+		queryResult.next();
+		ownerId = queryResult.getInt("id");
+	}
+
+	@Test
+	void visitDelete() throws SQLException {
+		PreparedStatement sql = connection.prepareStatement(
+			"DELETE FROM visits WHERE id = ?"
+		);
+		sql.setInt(1, visitId);
+		sql.executeUpdate();
+	}
+
+	@Test
+	void visitQuery() throws SQLException {
+		sql = connection.prepareStatement("SELECT * FROM visits WHERE id = ?");
+		sql.setInt(1, visitId);
+		queryResult = sql.executeQuery();
 	}
 }

@@ -1,4 +1,4 @@
-version: "3.9"
+version: "2.2"
 
 services:
   backend:
@@ -11,21 +11,19 @@ services:
     networks:
       app:
     environment:
-      SPRING_PROFILES_ACTIVE: prod
-      SPRING_DATASOURCE_URL: 'jdbc:postgresql://db/app-db'
-      SPRING_DATASOURCE_USERNAME: app-db-admin
-      SPRING_DATASOURCE_PASSWORD: P@ssw0rd
+      SPRING_PROFILES_ACTIVE: postgres
+      POSTGRES_URL: 'jdbc:postgresql://db/petclinic'
 
   db:
-    image: postgres:latest
+    image: postgres:14.3-alpine
     ports:
       - "5432:5432"
     networks:
       app:
     environment:
-      POSTGRES_DB: app-db
-      POSTGRES_USER: app-db-admin
-      POSTGRES_PASSWORD: P@ssw0rd
+      POSTGRES_DB: petclinic
+      POSTGRES_USER: petclinic
+      POSTGRES_PASSWORD: petclinic
 
 networks:
   app:
