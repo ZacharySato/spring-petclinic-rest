@@ -1,8 +1,16 @@
 package org.springframework.samples.petclinic;
 
-import org.junit.jupiter.api.*;
 
-import java.sql.*;
+import io.restassured.RestAssured;
+import io.restassured.authentication.PreemptiveBasicAuthScheme;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.when;
+import static org.hamcrest.Matchers.*;
+
 
 public class PetClinicApiTests {
 	private static Connection connection;
@@ -25,6 +33,11 @@ public class PetClinicApiTests {
 		connection.close();
 	}
 
+	@DisplayName("Включаем логи")
+	@BeforeAll
+	public static void setUpErrorLogging() {
+		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+	}
 	@Nested
 	@DisplayName("Visit Tests")
 	public class visitTest{
@@ -63,6 +76,7 @@ public class PetClinicApiTests {
 			queryResult = sql.executeQuery();
 		}*/
 
+
 		@Test
 		@DisplayName("Создание новой записи")
 		public void shouldCreateVisitWhenItsNewVisit(){}
@@ -73,11 +87,33 @@ public class PetClinicApiTests {
 
 		@Test
 		@DisplayName("Получение существующей записи")
-		public void shoulGetVisitWhenVisitIsFount(){}
+		public void shoulGetVisitWhenVisitIsFount(){
+			when()
+				.get("/owners/{ownerId}/pets/{petId}/visits",ownerId,petId)
+				.then()
+				.statusCode(200)
+				.body(
+					"id", is(notNullValue()),
+					"description", is(notNullValue()),
+					"date", is(notNullValue())
+				);
+		}
 
 		@Test
-		@DisplayName("Получение отсутствующей запис12иjj")
-		public void shoulGetVisitWhenVisitIsNotFount(){}
+		@DisplayName("Получение отсутствующей записи")
+		public void shoulGetVisitWhenVisitIsNotFount(){
+			when()
+			.get("/owners/{ownerId}/pets/{petId}/visits",ownerId,petId)
+			.then()
+			.statusCode(404);
+/*
+				.body(
+					"id", is(5),
+					"countryName", is("Ac"),
+					"locations", not(empty())
+				);
+				*/
+		}
 
 
 	}
@@ -125,11 +161,25 @@ public class PetClinicApiTests {
 
 		@Test
 		@DisplayName("Создание нового пользователя")
-		public void shouldCreateOwnerWhenShouldNotExists(){}
+		public void shouldCreateOwnerWhenShouldNotExists(){
+			when()
+				.post("/owners/{ownerId}/pets/{petId}/visits",ownerId,petId)
+				.then()
+				.statusCode(404);
+/*
+				.body(
+					"id", is(5),
+					"countryName", is("Ac"),
+					"locations", not(empty())
+				);
+				*/
+		}
 
 		@Test
 		@DisplayName("Получение пользователя")
-		public void shouldGetOwnerWhenShouldExists(){}
+		public void shouldGetOwnerWhenShouldExists(){
+
+		}
 
 
 	}
