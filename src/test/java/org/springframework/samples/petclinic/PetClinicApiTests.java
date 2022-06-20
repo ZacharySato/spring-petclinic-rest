@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
+
 import static org.hamcrest.Matchers.*;
 
 
@@ -165,14 +166,13 @@ public class PetClinicApiTests {
 			when()
 				.post("/owners/{ownerId}/pets/{petId}/visits",ownerId,petId)
 				.then()
-				.statusCode(404);
-/*
+				.statusCode(201)
 				.body(
 					"id", is(5),
-					"countryName", is("Ac"),
+					"firstName", is(OWNER_FIRSTNAME),
 					"locations", not(empty())
 				);
-				*/
+
 		}
 
 		@Test
