@@ -70,8 +70,8 @@ public class OwnerApiTests {
 	@Test
 	void visitCreate() throws SQLException {
 		var visitPetId = 1;
-		var visitDate = new Date(336614400000L);
-		var visitDesc = "test";
+		var visitDate = new Date(2302715081L);
+		var visitDesc = "resurrects";
 		sql = connection.prepareStatement(
 			"INSERT INTO visits(pet_id, visit_date, description) VALUES(?,?,?)",
 			Statement.RETURN_GENERATED_KEYS
