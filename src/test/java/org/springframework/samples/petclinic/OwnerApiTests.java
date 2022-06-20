@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;
-import java.time.LocalDate;
 
 public class OwnerApiTests {
 	private static Connection connection;
@@ -13,6 +12,10 @@ public class OwnerApiTests {
 	private Integer visitId;
 	private PreparedStatement sql;
 	private ResultSet queryResult;
+
+	private static final Integer VISIT_PET_ID = 1;
+	private static final Date VISIT_DATE = new Date(2302715081L);
+	private static final String VISIT_DESC = "resurrects";
 
 	@BeforeAll
 	public static void connect() throws SQLException {
@@ -69,21 +72,18 @@ public class OwnerApiTests {
 
 	@Test
 	void visitCreate() throws SQLException {
-		var visitPetId = 1;
-		var visitDate = new Date(2302715081L);
-		var visitDesc = "resurrects";
 		sql = connection.prepareStatement(
 			"INSERT INTO visits(pet_id, visit_date, description) VALUES(?,?,?)",
 			Statement.RETURN_GENERATED_KEYS
 		);
-		sql.setInt(1, visitPetId);
-		sql.setDate(2, visitDate);
-		sql.setString(3, visitDesc);
+		sql.setInt(1, VISIT_PET_ID);
+		sql.setDate(2, VISIT_DATE);
+		sql.setString(3, VISIT_DESC);
 
 		sql.executeUpdate();
 		queryResult = sql.getGeneratedKeys();
 		queryResult.next();
-		ownerId = queryResult.getInt("id");
+		visitId = queryResult.getInt("id");
 	}
 
 	@Test
