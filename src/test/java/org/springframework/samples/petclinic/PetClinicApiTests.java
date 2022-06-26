@@ -6,6 +6,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.samples.petclinic.owner.Owner;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
@@ -16,8 +17,6 @@ import static org.hamcrest.Matchers.*;
 
 public class PetClinicApiTests {
 	private static Connection connection;
-	private Integer visitId;
-
 	private PreparedStatement sql;
 	private ResultSet queryResult;
 
@@ -45,8 +44,8 @@ public class PetClinicApiTests {
 	@DisplayName("Visit Tests")
 	public class visitTests {
 		private final Integer VISIT_PET_ID = 1;
-		private final Date VISIT_DATE = new Date(2302715081L); //1970
-		private final String VISIT_DESC = "resurrects";
+		private final Integer VISIT_OWNER_ID = 1;
+		private Integer visitId;
 
 		@BeforeEach
 		void visitCreate() throws SQLException {
@@ -55,8 +54,8 @@ public class PetClinicApiTests {
 				Statement.RETURN_GENERATED_KEYS
 			);
 			sql.setInt(1, VISIT_PET_ID);
-			sql.setDate(2, VISIT_DATE);
-			sql.setString(3, VISIT_DESC);
+			sql.setDate(2, Date.valueOf(LocalDate.now()));
+			sql.setString(3, "Test description");
 
 			sql.executeUpdate();
 			queryResult = sql.getGeneratedKeys();
@@ -79,39 +78,27 @@ public class PetClinicApiTests {
 			queryResult = sql.executeQuery();
 		}
 
-
 		@Test
-		@DisplayName("Создание новой записи")
-		public void shouldCreateVisitWhenItsNewVisit() {
-		}
-
-		@Test
-		@DisplayName("Создание дублирующей записи / повторная запись")
-		//Ожидаемый результат будет зависеть от поведения метода
-		public void shouldCreateVisitWhenItsNotNewVisit() {
-		} //Поменять название метода в зависимости от ОР
-
-		@Test
-		@DisplayName("Получение существующей записи")
-		public void shoulGetVisitWhenVisitIsFount() {
-	/*		when()
-				.get("/owners/{ownerId}/pets/{petId}/visits", ownerId, VISIT_PET_ID)
+		@DisplayName("Get existed visit")
+		public void shouldGetVisitWhenVisitIsFount() {
+			when()
+				.get("/owners/{ownerId}/pets/{petId}/visits", VISIT_OWNER_ID, VISIT_PET_ID)
 				.then()
 				.statusCode(200)
 				.body(
 					"id", is(notNullValue()),
 					"description", is(notNullValue()),
 					"date", is(notNullValue())
-				);*/
+				);
 		}
 
 		@Test
-		@DisplayName("Получение отсутствующей записи")
-		public void shoulGetVisitWhenVisitIsNotFount() {
-/*			when()
-				.get("/owners/{ownerId}/pets/{petId}/visits", ownerId, VISIT_PET_ID)
+		@DisplayName("Get nonexistent visit")
+		public void shouldGetVisitWhenVisitIsNotFount() {
+			when()
+				.get("/owners/{ownerId}/pets/{petId}/visits", VISIT_OWNER_ID, VISIT_PET_ID)
 				.then()
-				.statusCode(404);*/
+				.statusCode(404);
 		}
 	}
 
@@ -179,7 +166,7 @@ public class PetClinicApiTests {
 				.body("firstName", is(newOwnerFirstName));
 			ownerFindQuery();
 			queryResult.next();
-			assertThat(queryResult.getString("firstName"), is(newOwnerFirstName));
+			assertThat(queryResult.getString("first_name"), is(newOwnerFirstName));
 		}
 
 		@Test
