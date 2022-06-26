@@ -1,22 +1,23 @@
 package org.springframework.samples.petclinic;
 
-import java.sql.*;
 import io.restassured.RestAssured;
-import io.restassured.authentication.PreemptiveBasicAuthScheme;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.*;
+import org.springframework.samples.petclinic.owner.Owner;
+
+import java.sql.*;
+import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
-
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 
 public class PetClinicApiTests {
 	private static Connection connection;
-	private Integer ownerId;
 	private Integer visitId;
 
-	private Integer petId = 1;
 	private PreparedStatement sql;
 	private ResultSet queryResult;
 
@@ -34,14 +35,15 @@ public class PetClinicApiTests {
 		connection.close();
 	}
 
-	@DisplayName("Включаем логи")
+	@DisplayName("Enable logging")
 	@BeforeAll
 	public static void setUpErrorLogging() {
 		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
 	}
+
 	@Nested
 	@DisplayName("Visit Tests")
-	public class visitTest{
+	public class visitTests {
 		private final Integer VISIT_PET_ID = 1;
 		private final Date VISIT_DATE = new Date(2302715081L); //1970
 		private final String VISIT_DESC = "resurrects";
@@ -71,71 +73,77 @@ public class PetClinicApiTests {
 			sql.executeUpdate();
 		}
 
-/*		void visitQuery() throws SQLException {
+		void visitQuery() throws SQLException {
 			sql = connection.prepareStatement("SELECT * FROM visits WHERE id = ?");
 			sql.setInt(1, visitId);
 			queryResult = sql.executeQuery();
-		}*/
+		}
 
 
 		@Test
 		@DisplayName("Создание новой записи")
-		public void shouldCreateVisitWhenItsNewVisit(){}
+		public void shouldCreateVisitWhenItsNewVisit() {
+		}
 
 		@Test
-		@DisplayName("Создание дублирующей записи / повторная запись") //Ожидаемый результат будет зависеть от поведения метода
-		public void shouldCreateVisitWhenItsNotNewVisit(){} //Поменять название метода в зависимости от ОР
+		@DisplayName("Создание дублирующей записи / повторная запись")
+		//Ожидаемый результат будет зависеть от поведения метода
+		public void shouldCreateVisitWhenItsNotNewVisit() {
+		} //Поменять название метода в зависимости от ОР
 
 		@Test
 		@DisplayName("Получение существующей записи")
-		public void shoulGetVisitWhenVisitIsFount(){
-			when()
-				.get("/owners/{ownerId}/pets/{petId}/visits",ownerId,petId)
+		public void shoulGetVisitWhenVisitIsFount() {
+	/*		when()
+				.get("/owners/{ownerId}/pets/{petId}/visits", ownerId, VISIT_PET_ID)
 				.then()
 				.statusCode(200)
 				.body(
 					"id", is(notNullValue()),
 					"description", is(notNullValue()),
 					"date", is(notNullValue())
-				);
+				);*/
 		}
 
 		@Test
 		@DisplayName("Получение отсутствующей записи")
-		public void shoulGetVisitWhenVisitIsNotFount(){
-			when()
-			.get("/owners/{ownerId}/pets/{petId}/visits",ownerId,petId)
-			.then()
-			.statusCode(404);
+		public void shoulGetVisitWhenVisitIsNotFount() {
+/*			when()
+				.get("/owners/{ownerId}/pets/{petId}/visits", ownerId, VISIT_PET_ID)
+				.then()
+				.statusCode(404);*/
 		}
-
-
 	}
+
 	@Nested
 	@DisplayName("Owner Tests")
-	public class ownerTest{
-		private final String OWNER_FIRST_NAME = "John";
-		private final String OWNER_SECOND_NAME = "Cena";
-		private final String OWNER_ADDRESS = "1241, East Main Street";
-		private final String OWNER_CITY = "Stamford";
-		private final String OWNER_TELEPHONE = "6085551023";
+	public class ownerTests {
+		private final Owner testOwner = new Owner();
+		private int nextIdAfterGenerated;
 
 		@BeforeEach
 		void ownerCreate() throws SQLException {
+			testOwner.setFirstName("John");
+			testOwner.setLastName("Cena");
+			testOwner.setAddress("1241, East Main Street");
+			testOwner.setCity("Stamford");
+			testOwner.setTelephone("6085551023");
+
 			sql = connection.prepareStatement(
 				"INSERT INTO owners(first_name, last_name, address, city, telephone) VALUES(?,?,?,?,?)",
 				Statement.RETURN_GENERATED_KEYS
 			);
-			sql.setString(1, OWNER_FIRST_NAME);
-			sql.setString(2, OWNER_SECOND_NAME);
-			sql.setString(3, OWNER_ADDRESS);
-			sql.setString(4, OWNER_CITY);
-			sql.setString(5, OWNER_TELEPHONE);
+			sql.setString(1, testOwner.getFirstName());
+			sql.setString(2, testOwner.getLastName());
+			sql.setString(3, testOwner.getAddress());
+			sql.setString(4, testOwner.getCity());
+			sql.setString(5, testOwner.getTelephone());
 
 			sql.executeUpdate();
 			queryResult = sql.getGeneratedKeys();
 			queryResult.next();
-			ownerId = queryResult.getInt("id");
+			testOwner.setId(queryResult.getInt("id"));
+			nextIdAfterGenerated = testOwner.getId() + 1;
 		}
 
 		@AfterEach
@@ -143,56 +151,56 @@ public class PetClinicApiTests {
 			PreparedStatement sql = connection.prepareStatement(
 				"DELETE FROM owners WHERE id = ?"
 			);
-			sql.setInt(1, ownerId);
+			sql.setInt(1, testOwner.getId());
 			sql.executeUpdate();
 		}
 
-/*		void ownerFindQuery() throws SQLException {
+		void ownerFindQuery() throws SQLException {
 			sql = connection.prepareStatement("SELECT * FROM owners WHERE id = ?");
-			sql.setInt(1, ownerId);
+			sql.setInt(1, testOwner.getId());
 			queryResult = sql.executeQuery();
-		}*/
+		}
 
 		@Test
-		@DisplayName("Создание нового пользователя")
-		public void shouldCreateOwnerWhenShouldNotExists(){
-			when()
-				.post("/owners/{ownerId}",ownerId)
+		@DisplayName("Create owner")
+		public void shouldCreateOwnerWhenNotExists() throws SQLException {
+			ownerDelete();
+			String newOwnerFirstName = UUID.randomUUID().toString().substring(4);
+			testOwner.setFirstName(newOwnerFirstName);
+			testOwner.setId(nextIdAfterGenerated);
+			given()
+				.contentType(ContentType.JSON)
+				.body(testOwner)
+				.when()
+				.post("/owners")
 				.then()
 				.statusCode(201)
-				.body(
-
-					"firstName", is(OWNER_FIRST_NAME),
-					"id", not(empty())
-
-				);
-
+				.body("id", not(empty()))
+				.body("firstName", is(newOwnerFirstName));
+			ownerFindQuery();
+			queryResult.next();
+			assertThat(queryResult.getString("firstName"), is(newOwnerFirstName));
 		}
 
 		@Test
-		@DisplayName("Получение пользователя")
-		public void shouldGetOwnerWhenShouldExists(){
+		@DisplayName("Get existed owner")
+		public void shouldGetOwnerWhenExists() {
 			when()
-				.get("/owners/{ownerId}", ownerId)
+				.get("/owners/{ownerId}", testOwner.getId())
 				.then()
 				.statusCode(200)
-				.body("firstName", is(OWNER_FIRST_NAME))
-				.body("lastName", is(OWNER_FIRST_NAME))
-				.body("telephone", is(OWNER_TELEPHONE));
+				.body("firstName", is(testOwner.getFirstName()))
+				.body("lastName", is(testOwner.getLastName()))
+				.body("telephone", is(testOwner.getTelephone()));
 		}
 
-
-	}
-	@Nested
-	@DisplayName("Pets Tests")
-	public class petsTest{
-
-
-	}
-	@Nested
-	@DisplayName("Crash Tests")
-	public class crashTest{
-
-
+		@Test
+		@DisplayName("Get nonexistent owner")
+		public void shouldNotGetOwnerWhenNotExists() {
+			when()
+				.get("/owners/{ownerId}", nextIdAfterGenerated)
+				.then()
+				.statusCode(404);
+		}
 	}
 }
